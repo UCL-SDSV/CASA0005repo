@@ -395,7 +395,7 @@ Leave the replace box empty each time and click Replace All to remove these from
 1. Once you have cleaned out all of the trixy characters from the file, to read it into R, we will use the ```read.csv()``` function:
 
 ```{r, cache=FALSE}
-LondonDataOSK<- read.csv("prac2_data/ward-profiles-excel-version.csv", 
+LondonDataOSK<- read.csv("/Users/xuanshi/SDSV/CASA0005/GIS02/LondonData.csv", 
                          header = TRUE, 
                          sep = ",",  
                          encoding = "latin1")
@@ -404,7 +404,7 @@ LondonDataOSK<- read.csv("prac2_data/ward-profiles-excel-version.csv",
 > **Note**, I've made an R project for all these practicals, which is why my file path starts with ```prac2_data/```. If you save the ```.csv``` in the same folder as the ```.Rproj``` then you can just use:
 
 ```{r eval=FALSE, cache=FALSE}
-LondonDataOSK<- read.csv("ward-profiles-excel-version.csv", 
+LondonDataOSK<- read.csv("/Users/xuanshi/SDSV/CASA0005/GIS02/LondonData.csv", 
                          sep=",")
 ```
 
@@ -415,7 +415,7 @@ If you look at the ```read.csv()``` help file - ```?read.csv``` - you will see t
 #but on a windows file system it is defined with \. 
 #Using \\ instead allows R 
 #to read the path correctly – alternatively, just use /
-LondonDataOSK<- read.csv("prac2_data/ward-profiles-excel-version.csv", 
+LondonDataOSK<- read.csv("/Users/xuanshi/SDSV/CASA0005/GIS02/LondonData.csv", 
                          header = TRUE, sep = ",", encoding = "latin1")
 ```
 
@@ -442,11 +442,16 @@ here::here()
 This is my working directory for this book project! Now i can use this to load my data that is in my practical 2 folder just like this....
 
 ```{r, cache=FALSE}
-LondonDataOSK<- read.csv(here::here("prac2_data","ward-profiles-excel-version.csv"), 
+LondonDataOSK<- read.csv(here::here("GIS02","ward-profiles-excel-version.csv"), 
                          header = TRUE, sep = ",",  
                          encoding = "latin1")
 ```
 
+```{r, cache=FALSE}
+LondonDataOSK<- read.csv(here::here("GIS02","ward-profiles-excel-version.csv"), 
+                         header = TRUE, sep = ",",  
+                         encoding = "latin1")
+```
 This just removes any need for ever using a `/` or `\\` in your file path. As with everything in code, there is no right way, use what suits you.
 
 ```{r echo=FALSE, out.width = "450pt", fig.align='center', cache=FALSE}
@@ -472,6 +477,7 @@ knitr::include_graphics('allisonhorst_images/parse_number.png')
 Here we will use it to just read in a `.csv` file (directly from the web this time --- ```read.csv``` can do this too) and clean text characters out from the numeric columns before they cause problems:
 
 ```{r, message=FALSE, cache=FALSE}
+library(readr)
 #wang the data in straight from the web using read_csv, 
 #skipping over the 'n/a' entries as you go...
 LondonData <- read_csv("https://data.london.gov.uk/download/ward-profiles-and-atlas/772d2d64-e8c6-46cb-86f9-e52b4c7851bc/ward-profiles-excel-version.csv",
@@ -522,6 +528,7 @@ Now run the Datatypelist code again --- you should see that some of the columns 
 If you ever wish to quickly edit data, then use `edit()`
 
 ```{r, eval=FALSE, cache=FALSE}
+
 LondonData <- edit(LondonData)
 ```
 
@@ -961,7 +968,7 @@ BoroughDataMap2 <- EW %>%
 
 ```
 
-If there are mutliple matches then all hits are returned...
+If there are multiple matches then all hits are returned...
 
 ```{r echo=FALSE, out.width = "500px", fig.align='center', cache=FALSE, fig.cap="Taken from Tidy explain by Garrick Aden‑Buie"}
 knitr::include_graphics('prac2_images/left-join-extra.gif') 
@@ -990,6 +997,11 @@ qtm(BoroughDataMap,
 But that's a bit basic! How about adding a basemap...to get a basemap we need to extract it from OpenStreetMap (OSM) using the `read_osm()` function from the `tmaptools` package. We talk about this in later weeks, but it's a free editable map of the World (the Wikipedia of maps). We are going to need to create a box (termed bounding box) around London using the `st_box()` function from the `sf` package to extract the basemap image (which is a raster). 
 
 ```{r, eval=TRUE, cache=FALSE}
+install.packages('OpenStreetMap')
+
+
+library(rJava)
+library(OpenStreetMap)
 tmaplondon <- BoroughDataMap %>%
   st_bbox(.) %>% 
   tmaptools::read_osm(., type = "osm", zoom = NULL)
@@ -1007,8 +1019,9 @@ There is a bit of extra code below that we haven't explained:
 ```{r, eval=FALSE, cache=FALSE}
 tmap_mode("plot")
 
-tm_shape(tmaplondon)+
-tm_rgb()+
+#tm_shape(tmaplondon)+
+
+#tm_rgb()+
 tm_shape(BoroughDataMap) + 
 tm_polygons("rate_of_job_seekers_allowance_jsa_claimants_2015", 
         style="jenks",
@@ -1045,8 +1058,8 @@ Now let's make the map!
 ```{r, message=FALSE}
 tmap_mode("plot")
 
-tm_shape(tmaplondon)+
-tm_rgb()+
+#tm_shape(tmaplondon)+
+#tm_rgb()+
 tm_shape(Life_expectancy4map) + 
 tm_polygons("UKdiff", 
         style="pretty",
